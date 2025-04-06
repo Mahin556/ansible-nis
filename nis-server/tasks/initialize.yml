@@ -1,0 +1,7 @@
+---
+
+- name: Initialize NIS Master
+  ansible.builtin.shell:
+    cmd: "echo | /usr/lib64/yp/ypinit -m"
+  args:
+    creates: /var/yp/example.com/ypservers  # Avoids running again if already initialized

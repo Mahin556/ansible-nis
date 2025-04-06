@@ -1,0 +1,10 @@
+---
+- name: Configuring a nis server
+  include_tasks: install.yml
+
+- name: initializing a nis server
+  include_tasks: initialize.yml
+  when: nis_initialize ==  true
+
+
+

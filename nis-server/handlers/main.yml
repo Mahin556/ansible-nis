@@ -1,0 +1,24 @@
+---
+- name: restart ypserv
+  service: 
+    name: ypserv 
+    state: restarted
+  when: nis_server|bool
+
+- name: restart ypbind
+  service: 
+    name: ypbind 
+    state: restarted
+  when: not nis_server|bool
+
+- name: restart rpcbind
+  service: 
+    name: rpcbind 
+    state: restarted
+
+- name: restart yppasswdd
+  service: 
+    name: yppasswdd 
+    state: restarted
+
+

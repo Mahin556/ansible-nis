@@ -1,0 +1,21 @@
+---
+nis_client_packages:
+  - ypbind
+  - yp-tools
+  - rpcbind
+  - nscd
+
+nis_client_daemons:
+  - ypbind
+  - rpcbind
+  - firewalld
+
+nis_manage_nscd: True
+nis_nscd_enabled: "true"
+nis_nscd_state: "started"
+
+nis_domain: "example.com"
+nis_server_hostname: "nisserver.{{ nis_domain }}"
+nis_client_hostname: "nisclient1.{{ nis_domain }}"
+
+
