@@ -1,0 +1,14 @@
+
+- name: PREPARE MASTER MAP FILE
+  template:
+    src: auto.master.j2
+    dest: /etc/auto.master.d/home.autofs
+    mode: "0644"
+  notify: restart autofs
+
+- name: PREPARE MAP FILE FOR EACH MOUNT
+  template:
+    src: auto.misc.j2
+    dest: /etc/home.misc
+    mode: "0644"
+  notify: restart autofs

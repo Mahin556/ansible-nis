@@ -1,0 +1,29 @@
+---
+- name: INSTALLING A REQUIRED PACKAGES
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ pkgs }}"
+  notify: restart autofs
+
+- name: stop autofs if already running
+  service:
+    name: autofs
+    state: stopped
+  notify: restart autofs
+    
+- name: including autofs.yml file
+  include_tasks: autofs.yml
+
+- name: configuring a selinux
+  selinux:
+    policy: targeted
+    state: permissive
+
+- name: starting a firewall
+  service: 
+    name: firewalld
+    state: restarted
+    enabled: true
+  notify: config firewall rules
+

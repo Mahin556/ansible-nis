@@ -1,0 +1,4 @@
+---
+pkgs:
+  - nfs-utils
+  - rpcbind

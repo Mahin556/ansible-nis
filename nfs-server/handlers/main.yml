@@ -1,0 +1,17 @@
+---
+- name: reload /etc/exports file
+  command: "exportfs -ar"
+
+- name: config firewall rules
+  firewalld:
+    service: "{{ item }}"
+    state: enabled
+    permanent: true
+    immediate: true
+  loop:
+    - nfs
+    - rpc-bind
+    - mountd
+
+
+

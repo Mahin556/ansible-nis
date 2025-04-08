@@ -1,4 +1,7 @@
 ---
+- name: Creating a map file in /var/yp for domain
+  shell: make -C /var/yp &> /dev/null
+
 - name: Initialize NIS Master
   shell:
     cmd: "echo | /usr/lib64/yp/ypinit -m"

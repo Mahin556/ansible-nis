@@ -1,0 +1,42 @@
+---
+- name: INSTALLING A REQUIRED PACKAGES
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ pkgs }}"
+  
+- name: STARTING A SERVICES
+  service:
+    name: "{{ item }}"
+    state: restarted
+    enabled: true
+  loop:
+    - nfs-server
+    - rpcbind
+    - firewalld
+  notify:
+    - config firewall rules
+
+- name: CONFIG SELINUX
+  selinux:
+    policy: targeted
+    state: permissive
+
+- name: CREATING A USER'S 
+  user:
+    name: "{{ item.name }}"
+    state: present
+    uid: "{{ item.uid }}"
+    home: "{{ item.home }}"
+    password: "{{ item.passwd | password_hash('sha512') }}" 
+  loop: "{{ user_accounts }}"
+  no_log: yes
+  ignore_errors: true
+
+- name: EXPORTING USER'S HOME DIRECTORY
+  template:
+    src: exports.j2
+    dest: /etc/exports
+  notify:
+    - reload /etc/exports file
+  

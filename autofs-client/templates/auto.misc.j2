@@ -1,0 +1,4 @@
+{% for item in user_accounts %}
+{{ item.home }}  -rw,sync  -fstype=nfs {{ nis_server }}:{{ item.home }}
+{% endfor %}
+

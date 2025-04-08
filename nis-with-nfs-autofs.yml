@@ -1,0 +1,32 @@
+---
+- name: SETUP NIS WITH SHARED USER'S HOME DIRECTORIES
+  hosts: nis-systems
+  become: true
+  gather_facts: true
+  vars:
+    nis_server_enabled: true
+    nis_client_enabled: true
+    nis_server: 192.168.1.147
+  vars_files:
+    - user_accounts.yml
+  tasks:
+    - name: CONFIGURING A NIS
+      when: ( ansible_distribution | lower in ['centos','redhat'] ) and ansible_distribution_major_version == '7'
+      block:
+        - name: CONFIGURING A NIS-SERVER
+          include_role:
+            name: "{{ item }}"
+          loop:
+            - nfs-server
+            - nis-server
+          when: inventory_hostname in groups['nis-server'] and nis_server_enabled == true
+        - name: CONFIGURING A NIS-CLIENT
+          include_role:
+            name: "{{ item }}"
+          loop:
+            - autofs-client
+            - nis-client
+          when: inventory_hostname in groups['nis-client'] and nis_client_enabled == true
+      ignore_errors: false
+
+
