@@ -4,8 +4,22 @@
     name: ypbind
     state: restarted
 
+- name: restart rpcbind
+  service:
+    name: rpcbind
+    state: restarted
+
 - name: restart autofs
   service:
     name: autofs
     state: restarted
 
+- name: config firewall rules
+  firewalld:
+    port: "{{ item }}"
+    state: enabled
+    permanent: true
+    immediate: true
+  loop:
+    - "{{ rpcbind_port }}/tcp"
+    - "{{ rpcbind_port }}/udp"

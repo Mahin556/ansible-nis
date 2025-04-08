@@ -5,12 +5,11 @@
     state: present
   with_items: "{{ nis_client_packages }}"
   notify:
-    - restart ypbind
     - restart rpcbind
 
 - name: Setting up a hostname for nis client
   hostname:
-    name: "{{ nis_client_hostname }}"
+    name: "{{ nis_client.fqdn }}"
 
 - name: Setting up a ypdomainname
   command: "ypdomainname {{ nis_domain }}"  #domainname nis.example.com
@@ -22,8 +21,7 @@
     line: "{{ item.line }}"
     insertbefore: EOF
   loop:
-    - { regexp: "192.168.1.94 .*", line: "192.168.1.94 {{ nis_server_hostname }}" }
-    - { regexp: "192.168.1.93 .*", line: "192.168.1.93 {{ nis_client_hostname }}" }
+    - { regexp: "^.*{{ nis_server.fqdn }}\\s+{{ nis_server.alias }}.*$", line: "192.168.1.147 {{ nis_server.fqdn }} {{ nis_server.alias }}" }
 
 - name: configuring a yp.conf file on nis client
   template:
@@ -32,8 +30,6 @@
     owner: root
     group: root
     mode: "0644"
-  notify:
-    - restart ypbind
 
 - name: configuring a nsswitch.conf file on nis client
   template:
@@ -58,7 +54,6 @@
     - { regexp: 'NISDOMAIN=.*', line: 'NISDOMAIN={{ nis_domain }}' }
   notify:
     - restart rpcbind
-    - restart ypbind
 
 - name: making selinux permissive
   selinux:
@@ -66,19 +61,26 @@
     state: permissive
 
 - name: client of nis-server
-  script: client.sh
-  notify: restart ypbind
+  command: "authconfig --enablenis --nisdomain={{ nis_domain }}  --nisserver={{ nis_server.fqdn }} --enablemkhomedir --update"
+  register: command_state
+  failed_when: command_state.rc != 0
 
-- name: Starting a services on NIS client
+- name: Starting a firewalld
   service:
-    name: "{{ item }}"
-    state: started
+    name: firewalld
+    state: restarted
     enabled: true
-  with_items: "{{ nis_client_daemons }}"
+  notify: config firewall rules
+
+- name: Starting a ypbind
+  service:
+    name: firewalld
+    state: restarted
+    enabled: true
   
 - name: enable and start nscd
   service:
     name: nscd
     enabled: "{{ nis_nscd_enabled }}"
-    state: "{{ nis_nscd_state }}"
+    state: restarted
   when: nis_manage_nscd|bool

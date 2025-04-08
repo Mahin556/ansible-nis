@@ -1,2 +1,6 @@
 ---
-# defaults file for nis-client
+nis_client_packages:
+  - ypbind
+  - yp-tools
+  - rpcbind
+  - nscd

@@ -20,5 +20,4 @@
 #       none of them is rechable, try a broadcast call to
 #       find a server.
 #
-#domain {{ nis_domain }} server {{ nis_server_hostname }}
-domain {{ nis_domain }} server {{ nis_server_hostname }}
+domain {{ nis_domain }} server {{ nis_server.fqdn }}

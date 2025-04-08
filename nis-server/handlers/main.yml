@@ -3,13 +3,6 @@
   service: 
     name: ypserv 
     state: restarted
-  when: nis_server|bool
-
-- name: restart ypbind
-  service: 
-    name: ypbind 
-    state: restarted
-  when: not nis_server|bool
 
 - name: restart rpcbind
   service: 
@@ -21,4 +14,15 @@
     name: yppasswdd 
     state: restarted
 
-
+- name: config firewall rules
+  firewalld:
+    port: "{{ item }}"
+    state: enabled
+    permanent: true
+    immediate: true
+  loop:
+    - "{{ ypserv_port }}/tcp"
+    - "{{ ypserv_port }}/udp"
+    - "{{ ypxfrd_port }}/tcp"
+    - "{{ ypxfrd_port }}/udp"
+    - "{{ yppasswdd_port }}/udp"
